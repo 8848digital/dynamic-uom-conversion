@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include dynamic_uom_conversion *.css
+recursive-include dynamic_uom_conversion *.csv
+recursive-include dynamic_uom_conversion *.html
+recursive-include dynamic_uom_conversion *.ico
+recursive-include dynamic_uom_conversion *.js
+recursive-include dynamic_uom_conversion *.json
+recursive-include dynamic_uom_conversion *.md
+recursive-include dynamic_uom_conversion *.png
+recursive-include dynamic_uom_conversion *.py
+recursive-include dynamic_uom_conversion *.svg
+recursive-include dynamic_uom_conversion *.txt
+recursive-exclude dynamic_uom_conversion *.pyc
