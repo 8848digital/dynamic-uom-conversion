@@ -1,29 +1,31 @@
-
 import frappe
 from frappe.utils import flt
 from frappe.email.doctype.notification.notification import get_context
 
 def item_validate(self,method):
-	uom_conversion_factor_based_formaula(self)
+	set_uom_conversion_factor(self)
 
-def uom_conversion_factor_based_formaula(self):
+def set_uom_conversion_factor(self):
 	if self.uoms and not self.has_variants:
-		for item in self.uoms:
-			if item.formula:
-				formula = item.formula.strip().lower().replace("\n", " ") if item.formula else None
+		for uom in self.uoms:
+			if uom.formula:
+				formula = uom.formula.strip().lower().replace("\n", "").replace("\r", "")		
 				if formula:
 					try:
-						item.conversion_factor = flt(frappe.safe_eval(get_eval_statement(self,formula), None, get_context(self.as_dict())))
+						uom.conversion_factor = flt(frappe.safe_eval(get_formula_with_values(self, formula), None, get_context(self.as_dict())))
 					except Exception as e:
 						frappe.throw(str(e))
 
-def get_eval_statement(self, formula):
-		my_eval_statement = formula.replace("\r", "").replace("\n", "")
-		for var in self.attributes:
-			if var.attribute_value:
-				if var.attribute.lower() in my_eval_statement:
-					my_eval_statement = my_eval_statement.replace('{' + var.attribute.lower() + '}', str(var.attribute_value))
-			else:
-				if var.attribute.lower() in my_eval_statement:
-					my_eval_statement = my_eval_statement.replace('{' + var.attribute.lower() + '}', '0.0')
-		return my_eval_statement
+def get_formula_with_values(self, formula):
+	for variant_attribute in self.attributes:
+		if variant_attribute.attribute_value:
+			attribute_field_name = variant_attribute.attribute.strip().lower().replace(" ", '_')
+			if attribute_field_name in formula:
+				formula = formula.replace('{' + attribute_field_name + '}', str(variant_attribute.attribute_value))
+		else:
+			if attribute_field_name in formula:
+				formula = formula.replace('{' + attribute_field_name + '}', '0.0')
+
+	return formula
+
+
